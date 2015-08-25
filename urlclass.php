@@ -30,7 +30,7 @@ function render() {
 	// If it doesn't end in php, then add default page
 	if (!strpos($url, '.php')) {
 		// Add trailing slash
-		if (substr($url, -1) !== '/') {
+		if (substr($url, -1) !== '/' && strlen($url)) {
 			$url .= '/';
 		}
 
@@ -38,6 +38,8 @@ function render() {
 	} else {
 		$url = substr($url, 0, strlen($url) - 4);
 	}
+
+	$url = str_replace('/', '-', $url);
 
 	if (empty($url)) {
 		$url = \Sleepy\Hook::addFilter('urlclass_default', 'index');
