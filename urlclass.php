@@ -15,7 +15,7 @@ namespace Module\URLclass;
  */
 function render() {
 	// Get the current URL
-	$url = \Sleepy\Hook::addFilter('urlclass_url', $_SERVER['REQUEST_URI']);
+	$url = \Sleepy\Hook::addFilter('urlclass_url', htmlspecialchars($_SERVER['REQUEST_URI']));
 
 	// Remove the parameters
 	if ($parameters = strlen($url) - (strlen($url) - strpos($url, '?'))) {
