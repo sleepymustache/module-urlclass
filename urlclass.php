@@ -15,7 +15,7 @@ namespace Module\URLclass;
  */
 function render() {
 	// Get the current URL
-	$url = \Sleepy\Hook::addFilter('urlclass_url', htmlspecialchars($_SERVER['REQUEST_URI']));
+	$url = \Sleepy\Hook::addFilter('urlclass_url', $_SERVER['REQUEST_URI']);
 
 	// Remove the parameters
 	if ($parameters = strlen($url) - (strlen($url) - strpos($url, '?'))) {
@@ -26,6 +26,12 @@ function render() {
 	if (strpos($url, '/') == 0) {
 		$url = substr($url, 1, strlen($url) - 1);
 	}
+
+	// Slashes become dashes
+	$url = str_replace('/', '-', $url);
+
+	// XSS Prevention
+	$url = preg_replace('/[^A-Za-z0-9\-]/', '', $url);
 
 	// If it doesn't end in php, then add default page
 	if (!strpos($url, '.php')) {
@@ -38,8 +44,6 @@ function render() {
 	} else {
 		$url = substr($url, 0, strlen($url) - 4);
 	}
-
-	$url = str_replace('/', '-', $url);
 
 	if (empty($url)) {
 		$url = \Sleepy\Hook::addFilter('urlclass_default', 'index');
