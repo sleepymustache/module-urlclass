@@ -36,7 +36,7 @@ function render() {
 	// If it doesn't end in php, then add default page
 	if (!strpos($url, '.php')) {
 		// Add trailing slash
-		if (substr($url, -1) !== '/' && strlen($url)) {
+		if (substr($url, -1) !== '-' && strlen($url)) {
 			$url .= '/';
 		}
 
