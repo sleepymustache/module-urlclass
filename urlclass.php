@@ -37,7 +37,7 @@ function render() {
 	if (!strpos($url, '.php')) {
 		// Add trailing slash
 		if (substr($url, -1) !== '-' && strlen($url)) {
-			$url .= '/';
+			$url .= '-';
 		}
 
 		$url = $url . \Sleepy\Hook::addFilter('urlclass_default', 'index');
