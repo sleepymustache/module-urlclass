@@ -30,8 +30,6 @@ function render() {
 	// Slashes become dashes
 	$url = str_replace('/', '-', $url);
 
-	// XSS Prevention
-	$url = preg_replace('/[^A-Za-z0-9\-]/', '', $url);
 
 	// If it doesn't end in php, then add default page
 	if (!strpos($url, '.php')) {
@@ -48,6 +46,9 @@ function render() {
 	if (empty($url)) {
 		$url = \Sleepy\Hook::addFilter('urlclass_default', 'index');
 	}
+
+	// XSS Prevention
+	$url = preg_replace('/[^A-Za-z0-9\-]/', '', $url);
 
 	return \Sleepy\Hook::addFilter('urlclass_class', $url);
 }
