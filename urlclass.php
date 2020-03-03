@@ -1,60 +1,98 @@
 <?php
-namespace Module\URLclass;
+/**
+ * URLClass Module
+ *
+ * The URLClass module adds a class to the placeholder {{ urlclass }} that can be
+ * used to uniquely identify a page in css.
+ *
+ * PHP version 7.0.0
+ *
+ * @category Module
+ * @package  Sleepy
+ * @author   Jaime A. Rodriguez <hi.i.am.jaime@gmail.com>
+ * @license  http://opensource.org/licenses/MIT; MIT
+ * @link     https://sleepymustache.com
+ */
+
+namespace Module\UrlClass;
+
+use \Sleepy\Core\Hook;
+use \Sleepy\Core\Module;
 
 /**
- * Generates a class based on the URL.
+ * The URLClass module
  *
- * This way we can target this page with css. Specifically it takes the folder
- * and filename and replaces the directory separator with a hyphen, e.g.
- * *\user\login\* will translate into *user-login-index*. The index added to the
- * end if we are using the default page. *\user\login.php* will translate into
- * *user-login*.
- *
- * @return string The class name
- * @internal
+ * @category Module
+ * @package  Sleepy
+ * @author   Jaime A. Rodriguez <hi.i.am.jaime@gmail.com>
+ * @license  http://opensource.org/licenses/MIT; MIT
+ * @link     https://sleepymustache.com
  */
-function render() {
-	// Get the current URL
-	$url = \Sleepy\Hook::addFilter('urlclass_url', $_SERVER['REQUEST_URI']);
+class UrlClass extends Module
+{
 
-	// Remove the parameters
-	if ($parameters = strlen($url) - (strlen($url) - strpos($url, '?'))) {
-		$url = substr($url, 0, $parameters);
-	}
+    public $hooks = [
+        'urlclass_preprocess'         => 'setup',
+        'render_placeholder_urlclass' => 'convert'
+    ];
 
-	// Remove first slash
-	if (strpos($url, '/') == 0) {
-		$url = substr($url, 1, strlen($url) - 1);
-	}
+    /**
+     * Setup the environments
+     *
+     * @return void
+     */
+    public function setup()
+    {
+        $this->environments['stage'] = false;
+        $this->environments['live']  = false;
+    }
 
-	// Slashes become dashes
-	$url = str_replace('/', '-', $url);
+    /**
+     * Convert the placeholder into the URLClass
+     *
+     * @param string $url The current URL
+     *
+     * @return void
+     */
+    public function convert($url)
+    {
+        // Get the current URL
+        $url = Hook::addFilter('urlclass_url', $_SERVER['REQUEST_URI']);
 
+        // Remove the parameters
+        if ($parameters = strlen($url) - (strlen($url) - strpos($url, '?'))) {
+            $url = substr($url, 0, $parameters);
+        }
 
-	// If it doesn't end in php, then add default page
-	if (!strpos($url, '.php')) {
-		// Add trailing slash
-		if (substr($url, -1) !== '-' && strlen($url)) {
-			$url .= '-';
-		}
+        // Remove first slash
+        if (strpos($url, '/') == 0) {
+            $url = substr($url, 1, strlen($url) - 1);
+        }
 
-		$url = $url . \Sleepy\Hook::addFilter('urlclass_default', 'index');
-	} else {
-		$url = substr($url, 0, strlen($url) - 4);
-	}
+        // Slashes become dashes
+        $url = str_replace('/', '-', $url);
 
-	if (empty($url)) {
-		$url = \Sleepy\Hook::addFilter('urlclass_default', 'index');
-	}
+        // If it doesn't end in php, then add default page
+        if (!strpos($url, '.php')) {
+            // Add trailing slash
+            if (substr($url, -1) !== '-' && strlen($url)) {
+                $url .= '-';
+            }
 
-	// XSS Prevention
-	$url = preg_replace('/[^A-Za-z0-9\-]/', '', $url);
+            $url = $url . Hook::addFilter('urlclass_default', 'index');
+        } else {
+            $url = substr($url, 0, strlen($url) - 4);
+        }
 
-	return \Sleepy\Hook::addFilter('urlclass_class', $url);
+        if (empty($url)) {
+            $url = Hook::addFilter('urlclass_default', 'index');
+        }
+
+        // XSS Prevention
+        $url = preg_replace('/[^A-Za-z0-9\-]/', '', $url);
+
+        return Hook::addFilter('urlclass_class', $url);
+    }
 }
 
-// Apply SM Hooks
-\Sleepy\Hook::applyFilter(
-	'render_placeholder_urlclass',
-	'\Module\URLclass\render'
-);
+Hook::register(new UrlClass());
