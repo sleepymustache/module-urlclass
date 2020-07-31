@@ -32,20 +32,8 @@ class UrlClass extends Module
 {
 
     public $hooks = [
-        'urlclass_preprocess'         => 'setup',
         'render_placeholder_urlclass' => 'convert'
     ];
-
-    /**
-     * Setup the environments
-     *
-     * @return void
-     */
-    public function setup()
-    {
-        $this->environments['stage'] = false;
-        $this->environments['live']  = false;
-    }
 
     /**
      * Convert the placeholder into the URLClass
