@@ -17,6 +17,8 @@ function render() {
 	// Get the current URL
 	$url = \Sleepy\Hook::addFilter('urlclass_url', $_SERVER['REQUEST_URI']);
 
+	$url = str_replace(URLBASE, '', $url);
+
 	// Remove the parameters
 	if ($parameters = strlen($url) - (strlen($url) - strpos($url, '?'))) {
 		$url = substr($url, 0, $parameters);
